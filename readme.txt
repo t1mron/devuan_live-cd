@@ -53,24 +53,22 @@ EOF
 
 packagelist=(
   # basic
-  linux-image-5.10.0-7-amd64 grub2 sudo sysv-rc-conf network-manager iwd ssh neovim 
+  linux-image-5.10.0-8-amd64 grub2 sudo sysv-rc-conf network-manager iwd ssh neovim 
   # Window manager
-  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils rxvt-unicode rofi
+  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm rofi
   # Terminal tools 
-  f2fs-tools debootstrap arch-install-scripts man-db htop wget curl ping 
+  f2fs-tools debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
   # Multimedia
   flameshot mpv sxiv
 )
-
-apt install ${packagelist[@]}
 
 # clean apt downloaded archives
 apt clean
 
 # dotfiles
-git clone --depth=1 https://github.com/t1mron/dotfiles_devuan $HOME/git/dotfiles_devuan
-cp -r $HOME/git/dotfiles_devuan/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
-sudo cp -r $HOME/git/dotfiles_devuan/root/. /
+git clone --depth=1 https://github.com/t1mron/devuan_live-cd $HOME/git/devuan_live-cd
+cp -r $HOME/git/devuan_live-cd/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
+sudo cp -r $HOME/git/devuan_live-cd/root/. /
 
 # Setup grub
 sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
