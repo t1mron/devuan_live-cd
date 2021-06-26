@@ -1,0 +1,46 @@
+!! Appearance
+XTerm*renderFont: true
+!!XTerm*faceName: xft:Hack Nerd Font 
+XTerm*faceSize: 16
+XTerm*utf8: 2
+XTerm*locale: true
+
+Xft.dpi: 96
+Xft.antialias: true
+Xft.hinting: true
+Xft.rgba: rgb
+Xft.autohint: true
+Xft.hintstyle: hintfull
+Xft.lcdfilter: lcdfilter
+
+! I like a LOT of scrollback...
+XTerm*savelines: 16384
+
+! copy/past text
+xterm*VT100.Translations: #override \
+                 Ctrl Shift <Key>V:    insert-selection(CLIPBOARD) \n\
+                 Ctrl Shift <Key>C:    copy-selection(CLIPBOARD)
+
+! double-click to select whole URLs :D
+XTerm*charClass: 33:48,36-47:48,58-59:48,61:48,63-64:48,95:48,126:48
+
+!! Atom One Light theme
+xterm*background: #f9f9f9
+xterm*foreground: #383a42
+xterm*cursorColor: #d0d0d0
+xterm*color0: #000000
+xterm*color1: #E45649
+xterm*color2: #50A14F
+xterm*color3: #986801
+xterm*color4: #4078F2
+xterm*color5: #A626A4
+xterm*color6: #0184BC
+xterm*color7: #A0A1A7
+xterm*color8: #5c6370
+xterm*color9: #e06c75
+xterm*color10: #50A14F
+xterm*color11: #986801
+xterm*color12: #4078F2
+xterm*color13: #A626A4
+xterm*color14: #0184BC
+xterm*color15: #ffffff
