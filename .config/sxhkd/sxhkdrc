@@ -1,0 +1,84 @@
+#-----------------------------#
+# WINDOW / WORKSPACE COMMANDS #
+#-----------------------------#
+
+# close and kill focused window
+super + q
+	bspc node -{c,k}
+
+# change focus / move focused window
+super + {_,shift + }{h,j,k,l}
+	bspc node -{f,s} {west,south,north,east}
+
+# preselect focused window
+super + alt + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# cancel the preselection for the focused window
+super + alt + space
+	bspc node -p cancel
+
+# switch to workspace
+super + {1-9,0}
+	desktop='^{1-9,10}'; \
+	bspc query -D -d "$desktop.focused" && bspc desktop -f last || bspc desktop -f "$desktop"
+
+# move focused container to workspace
+super + shift + {1-9,0}
+	bspc node -d '^{1-9,10}'
+
+# enter fullscreen mode for the focused container
+super + shift + f
+	bspc desktop -l next
+
+# set the window state
+super + shift + s
+	bspc node focused -t \~floating
+
+# expand/contract a tiled window
+super + ctrl + {h,j,k,l}
+	bspc node -z {left -20 0 || bspc node -z right -20 0, \
+		bottom 0 20 || bspc node -z top 0 20,\
+		top 0 -20 || bspc node -z bottom 0 -20,\
+		right 20 0 || bspc node -z left 20 0}
+
+# expand/contract a window with mouse
+super + !button{1-3}
+	bspc pointer -t %i %i
+
+# make sxhkd reload its configuration files:
+super + shift + c
+	pkill -USR1 -x sxhkd
+
+# quit/reload bspwm
+super + shift + {End,r}
+	bspc {quit,wm -r}
+
+
+#----------------#
+# BASIC BINDINGS #
+#----------------#
+
+# rofi
+super + r
+	rofi -modi run,drun -show drun -location 2 -yoffset 150 -line-padding 4 -columns 1 -width 25 -lines 10 -padding 15 -hide-scrollbar -show-icons -drun-icon-theme
+
+# flameshoft
+Print
+	flameshot gui
+
+# terminal emulator
+super + Return
+        xterm
+
+# File Manager - ranger
+super + Tab
+	xterm -e ranger
+
+# Browser
+super + f
+	firefox
+
+# kill lag window
+super + Escape
+	xkill
