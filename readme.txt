@@ -60,6 +60,8 @@ packagelist=(
   flameshot mpv sxiv
 )
 
+apt install ${packagelist[@]}
+
 # clean apt downloaded archives
 apt clean
 
