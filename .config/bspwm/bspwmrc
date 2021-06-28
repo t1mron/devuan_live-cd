@@ -18,10 +18,12 @@ bspc config gapless_monocle      true
 bspc config focused_border_color \#00bfff
 bspc config normal_border_color  \#cccccc
 
-
 #----------------------#
 # STARTUP APPLICATIONS #
 #----------------------#
+
+# status bar
+$HOME/.config/polybar/scripts/launch.sh
 
 # change keyboard layout
 setxkbmap -option grp:alt_shift_toggle us,ru &
@@ -31,3 +33,6 @@ xsetroot -solid "#cccccc" &
 
 # Disable screen blanking
 xset -dpms s off &
+
+# Network manager tray
+nm-applet &
