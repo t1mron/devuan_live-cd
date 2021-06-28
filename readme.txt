@@ -56,7 +56,7 @@ packagelist=(
   # basic
   linux-image-5.10.0-8-amd64 grub2 sudo sysv-rc-conf network-manager iwd ssh neovim 
   # Window manager
-  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm rofi
+  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
   # Terminal tools 
   f2fs-tools git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
   # Multimedia
