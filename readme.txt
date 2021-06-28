@@ -26,6 +26,9 @@ arch-chroot /mnt /bin/bash
 useradd -G sudo -m -d /home/user user
 passwd user
 
+# default shell bash
+chsh -s /bin/bash user
+
 # Set the time zone and a system clock
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc --utc
@@ -55,9 +58,9 @@ packagelist=(
   # Window manager
   bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm rofi
   # Terminal tools 
-  f2fs-tools debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
+  f2fs-tools git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
   # Multimedia
-  flameshot mpv sxiv
+  flameshot sxiv
 )
 
 apt install ${packagelist[@]}
@@ -66,9 +69,9 @@ apt install ${packagelist[@]}
 apt clean
 
 # dotfiles
-git clone --depth=1 https://github.com/t1mron/devuan_live-cd $HOME/git/devuan_live-cd
-cp -r $HOME/git/devuan_live-cd/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
-sudo cp -r $HOME/git/devuan_live-cd/root/. /
+git clone --depth=1 https://github.com/t1mron/devuan_live-cd /home/user/git/devuan_live-cd
+cp -r /home/user/git/devuan_live-cd/. /home/user/ && rm -rf /home/user/{root,.git,LICENSE,README.md,readme.txt}
+cp -r /home/user/git/devuan_live-cd/root/. /
 
 # Setup grub
 sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
