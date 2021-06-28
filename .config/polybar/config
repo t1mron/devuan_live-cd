@@ -24,6 +24,7 @@ foreground = ${colors.foreground}
 fixed-center = true
 padding= 1
 module-margin = 1
+tray-position = right
 wm-restack = bspwm
 
 # Modules
@@ -91,16 +92,6 @@ label-empty =
 
 
 # RIGHT
-
-[module/wi-fi]
-type = internal/network
-
-interface = wlan0
-interval = 1
-
-label-connected = %{A1:$HOME/.config/polybar/scripts/rofi-wifi-menu.sh wlan0 3 30 -100:}%essid% %{A}
-label-disconnected = %{A1:$HOME/.config/polybar/scripts/rofi-wifi-menu.sh wlan0 3 30 -100:}%{F#cccccc}%{F-}%{A}
-
 
 [module/keyboard]
 type = internal/xkeyboard
