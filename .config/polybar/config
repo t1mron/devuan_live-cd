@@ -58,16 +58,16 @@ label-mounted =  %free%
 [module/bspwm]
 type = internal/bspwm
 
-ws-icon-0 = I;
-ws-icon-1 = II;
-ws-icon-2 = III;
-ws-icon-3 = IV;
-ws-icon-4 = V;
-ws-icon-5 = VI;
-ws-icon-6 = VII;
-ws-icon-7 = VIII;
-ws-icon-8 = IX;
-ws-icon-9 = X;
+ws-icon-0 = I;I
+ws-icon-1 = II;II
+ws-icon-2 = III;v
+ws-icon-3 = IV;IV
+ws-icon-4 = V;V
+ws-icon-5 = VI;VI
+ws-icon-6 = VII;VII
+ws-icon-7 = VIII;VIII
+ws-icon-8 = IX;IX
+ws-icon-9 = X;X
 
 pin-workspaces = true
 enable-click = true
