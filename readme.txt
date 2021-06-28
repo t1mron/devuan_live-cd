@@ -1,17 +1,17 @@
 # create usb os
 sudo apt install ssh debootstrap arch-install-scripts
 
-head -c 3145728 /dev/urandom > /dev/sdb; sync 
-(echo o;echo w) | fdisk /dev/sdb
+head -c 3145728 /dev/urandom > /dev/sda; sync 
+(echo o;echo w) | fdisk /dev/sda
 
 # /dev/sdb1 All Linux filesystem
-(echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sdb
+(echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sda
 
 # Formatting the partitions
-mkfs.ext4 /dev/sdb1
+mkfs.ext4 /dev/sda1
 
 # Mount partition
-mount /dev/sdb1 /mnt
+mount /dev/sda1 /mnt
 
 # Install base system
 debootstrap --variant=minbase --include=locales --arch amd64 ceres /mnt http://deb.devuan.org/merged/ 
