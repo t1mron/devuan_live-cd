@@ -25,8 +25,6 @@ arch-chroot /mnt /bin/bash
 # Create user
 useradd -G sudo -m -d /home/user user
 passwd user
-useradd -G sudo -m -d /home/help help
-passwd help
 
 # Set the time zone and a system clock
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
