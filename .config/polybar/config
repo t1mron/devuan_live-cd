@@ -60,7 +60,7 @@ type = internal/bspwm
 
 ws-icon-0 = I;I
 ws-icon-1 = II;II
-ws-icon-2 = III;v
+ws-icon-2 = III;III
 ws-icon-3 = IV;IV
 ws-icon-4 = V;V
 ws-icon-5 = VI;VI
