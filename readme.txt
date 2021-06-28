@@ -22,12 +22,11 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # Enter the new system
 arch-chroot /mnt /bin/bash
 
-# Create user
-useradd -G sudo -m -d /home/user user
-passwd user
+# root password
+passwd root
 
 # default shell bash
-chsh -s /bin/bash user
+chsh -s /bin/bash root
 
 # Set the time zone and a system clock
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
