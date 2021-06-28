@@ -60,7 +60,7 @@ packagelist=(
   # Terminal tools 
   f2fs-tools git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
   # Multimedia
-  flameshot sxiv
+  firefox flameshot sxiv
 )
 
 apt install ${packagelist[@]}
