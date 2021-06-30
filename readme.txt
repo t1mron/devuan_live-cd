@@ -28,7 +28,7 @@ packagelist=(
   # Window manager
   bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
   # Terminal tools 
-  git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
+  git debootstrap arch-install-scripts man-db htop wget inetutils-ping
   # Locale
   locales console-setup
   # Multimedia
