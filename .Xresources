@@ -1,6 +1,6 @@
 !! Appearance
 XTerm*renderFont: true
-!!XTerm*faceName: xft:DejaVu Sans Mono
+XTerm*faceName: xft:DejaVu Sans Mono
 XTerm*faceSize: 12
 XTerm*utf8: 2
 XTerm*locale: true
