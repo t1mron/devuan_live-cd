@@ -1,30 +1,18 @@
 # create usb os
-sudo apt-get install --assume-yes ssh debootstrap arch-install-scripts
+sudo apt-get install --assume-yes ssh debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
 
-head -c 3145728 /dev/urandom > /dev/sda; sync 
-(echo o;echo w) | fdisk /dev/sda
-
-# /dev/sdb1 All Linux filesystem
-(echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sda
-
-# Formatting the partitions
-mkfs.ext4 /dev/sda1
-
-# Mount partition
-mount /dev/sda1 /mnt
+# Create a directory where we will store all of the files
+mkdir -p $HOME/LIVE_BOOT
 
 # Install base system
-debootstrap --variant=minbase --arch amd64 ceres /mnt http://deb.devuan.org/merged/ 
-
-# Generate fstab
-genfstab -U /mnt >> /mnt/etc/fstab
+debootstrap --variant=minbase --arch amd64 ceres $HOME/LIVE_BOOT/chroot http://deb.devuan.org/merged/ 
 
 # Enter the new system
-arch-chroot /mnt /bin/bash
+sudo chroot $HOME/LIVE_BOOT/chroot
 
 packagelist=(
   # basic
-  linux-image-amd64 grub2 cryptsetup lvm2 sudo sysv-rc-conf ssh neovim 
+  linux-image-amd64 grub2 cryptsetup lvm2 live-boot sudo sysv-rc-conf ssh neovim 
   # Window manager
   bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
   # Terminal tools 
@@ -74,6 +62,12 @@ EOF
 git clone --depth=1 https://github.com/t1mron/devuan_live-cd $HOME/git/devuan_live-cd
 cp -r $HOME/git/devuan_live-cd/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
 cp -r $HOME/git/devuan_live-cd/root/. /
+
+
+
+
+
+
 
 # Setup grub
 sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
