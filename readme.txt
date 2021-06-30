@@ -45,7 +45,7 @@ DEBIAN_FRONTEND=noninteractive apt install ${packagelist[@]}
 apt clean
 
 # root password
-passwd root
+echo -e "toor\ntoor" | passwd root
 
 # default shell bash
 chsh -s /bin/bash root
