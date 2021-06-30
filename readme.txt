@@ -1,14 +1,26 @@
 # create usb os
 sudo apt-get install --assume-yes ssh debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
 
+head -c 3145728 /dev/urandom > /dev/sda; sync 
+(echo o;echo w) | fdisk /dev/sda
+
+# /dev/sdb1 All Linux filesystem
+(echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sda
+
+# Formatting the partitions
+mkfs.ext4 /dev/sda1
+
+# Mount partition
+mount /dev/sda1 /mnt
+
 # Create a directory where we will store all of the files
-mkdir -p $HOME/LIVE_BOOT
+mkdir -p /mnt/LIVE_BOOT
 
 # Install base system
 debootstrap --variant=minbase --arch amd64 ceres $HOME/LIVE_BOOT/chroot http://deb.devuan.org/merged/ 
 
 # Enter the new system
-sudo chroot $HOME/LIVE_BOOT/chroot
+sudo chroot /mnt/LIVE_BOOT/chroot
 
 packagelist=(
   # basic
