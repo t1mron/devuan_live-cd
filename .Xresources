@@ -1,7 +1,7 @@
 !! Appearance
 XTerm*renderFont: true
-!!XTerm*faceName: xft:Hack Nerd Font 
-XTerm*faceSize: 16
+!!XTerm*faceName: xft:DejaVu Sans Mono
+XTerm*faceSize: 12
 XTerm*utf8: 2
 XTerm*locale: true
 
