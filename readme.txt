@@ -17,7 +17,7 @@ mount /dev/sda1 /mnt
 mkdir -p /mnt/LIVE_BOOT
 
 # Install base system
-debootstrap --variant=minbase --arch amd64 ceres $HOME/LIVE_BOOT/chroot http://deb.devuan.org/merged/ 
+debootstrap --variant=minbase --arch amd64 ceres /mnt/LIVE_BOOT/chroot http://deb.devuan.org/merged/ 
 
 # Enter the new system
 sudo chroot /mnt/LIVE_BOOT/chroot
