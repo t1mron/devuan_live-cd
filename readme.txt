@@ -1,5 +1,5 @@
 # create usb os
-sudo apt install ssh debootstrap arch-install-scripts
+sudo apt-get install ssh debootstrap arch-install-scripts
 
 head -c 3145728 /dev/urandom > /dev/sda; sync 
 (echo o;echo w) | fdisk /dev/sda
@@ -39,7 +39,7 @@ packagelist=(
   firefox flameshot sxiv
 )
 
-DEBIAN_FRONTEND=noninteractive apt install ${packagelist[@]}
+DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
 
 # Delete modem manager
 apt-get purge modemmanager
@@ -57,7 +57,7 @@ chsh -s /bin/bash root
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc --utc
 
-# Set default locale (?!!!! double input)
+# Set default locale
 echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 
 # Update current locale
