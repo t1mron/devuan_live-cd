@@ -41,6 +41,9 @@ packagelist=(
 
 DEBIAN_FRONTEND=noninteractive apt install ${packagelist[@]}
 
+# Delete modem manager
+apt-get purge modemmanager
+
 # clean apt downloaded archives
 apt clean
 
