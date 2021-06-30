@@ -14,13 +14,31 @@ mkfs.ext4 /dev/sda1
 mount /dev/sda1 /mnt
 
 # Install base system
-debootstrap --variant=minbase --include=locales --arch amd64 ceres /mnt http://deb.devuan.org/merged/ 
+debootstrap --variant=minbase --arch amd64 ceres /mnt http://deb.devuan.org/merged/ 
 
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Enter the new system
 arch-chroot /mnt /bin/bash
+
+packagelist=(
+  # basic
+  linux-image-5.10.0-8-amd64 grub2 sudo sysv-rc-conf network-manager network-manager-gnome iwd ssh neovim 
+  # Window manager
+  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
+  # Terminal tools 
+  git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
+  # Locale
+  locales console-setup keyboard-configuration 
+  # Multimedia
+  firefox flameshot sxiv
+)
+
+DEBIAN_FRONTEND=noninteractive apt install ${packagelist[@]}
+
+# clean apt downloaded archives
+apt clean
 
 # root password
 passwd root
@@ -38,12 +56,6 @@ echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 # Update current locale
 locale-gen
 
-# Set system language
-echo LANG=en_US.UTF-8 >> /etc/locale.conf
-
-# Set keymap and font for console 
-echo -e "KEYMAP=ru\nFONT=cyr-sun16" >> /etc/vconsole.conf
-
 # Set the host
 cat << EOF > /etc/hosts
 127.0.0.1    localhost
@@ -51,26 +63,10 @@ cat << EOF > /etc/hosts
 127.0.1.1    devuan.localdomain devuan
 EOF
 
-packagelist=(
-  # basic
-  linux-image-5.10.0-8-amd64 grub2 sudo sysv-rc-conf network-manager network-manager-gnome iwd ssh neovim 
-  # Window manager
-  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
-  # Terminal tools 
-  f2fs-tools git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
-  # Multimedia
-  firefox flameshot sxiv
-)
-
-apt install ${packagelist[@]}
-
-# clean apt downloaded archives
-apt clean
-
 # dotfiles
-git clone --depth=1 https://github.com/t1mron/devuan_live-cd /home/user/git/devuan_live-cd
-cp -r /home/user/git/devuan_live-cd/. /home/user/ && rm -rf /home/user/{root,.git,LICENSE,README.md,readme.txt}
-cp -r /home/user/git/devuan_live-cd/root/. /
+git clone --depth=1 https://github.com/t1mron/devuan_live-cd $HOME/git/devuan_live-cd
+cp -r $HOME/git/devuan_live-cd/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
+cp -r $HOME/git/devuan_live-cd/root/. /
 
 # Setup grub
 sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
