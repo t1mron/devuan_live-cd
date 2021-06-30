@@ -1,5 +1,5 @@
 # create usb os
-sudo apt-get install --no-install-recommends --assume-yes ssh debootstrap arch-install-scripts
+sudo apt-get install --assume-yes ssh debootstrap arch-install-scripts
 
 head -c 3145728 /dev/urandom > /dev/sda; sync 
 (echo o;echo w) | fdisk /dev/sda
@@ -39,7 +39,7 @@ packagelist=(
   firefox flameshot sxiv
 )
 
-DEBIAN_FRONTEND=noninteractive apt --no-install-recommends --assume-yes install ${packagelist[@]}
+DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
 
 # Delete modem manager
 apt-get --assume-yes purge modemmanager
