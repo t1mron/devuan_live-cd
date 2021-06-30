@@ -24,13 +24,13 @@ arch-chroot /mnt /bin/bash
 
 packagelist=(
   # basic
-  linux-image-5.10.0-8-amd64 grub2 sudo sysv-rc-conf network-manager network-manager-gnome iwd ssh neovim 
+  linux-image-amd64 grub2 sudo sysv-rc-conf network-manager network-manager-gnome iwd ssh neovim 
   # Window manager
   bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
   # Terminal tools 
   git debootstrap arch-install-scripts man-db htop wget curl inetutils-ping
   # Locale
-  locales console-setup keyboard-configuration 
+  locales console-setup
   # Multimedia
   firefox flameshot sxiv
 )
@@ -53,8 +53,9 @@ hwclock --systohc --utc
 # Set default locale
 echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 
-# Update current locale
-locale-gen
+# Configure locales and keyboard
+dpkg-reconfigure locales
+dpkg-reconfigure keyboard-configuration 
 
 # Set the host
 cat << EOF > /etc/hosts
