@@ -13,8 +13,7 @@ height = 22
 
 # Fonts
 font-0 = DejaVu Sans Mono:size=9;2
-font-1 = Font Awesome 5 Free:style=Solid:size=12;2
-font-2 = Font Awesome 5 Brands:pixelsize=12;2
+font-1 = FontAwesome:size=12;2
 
 # Colors
 background = ${colors.background}
@@ -37,12 +36,12 @@ modules-right = wi-fi keyboard time
 
 [module/cpu]
 type = internal/cpu
-label =  %percentage:3%%
+label =  %percentage:3%%
 
 
 [module/memory]
 type = internal/memory
-label =  %gb_used%
+label =  %gb_used%
 interval = 3
 
 
@@ -52,6 +51,7 @@ interval = 25
 mount-0 = /
 
 label-mounted =  %free%
+
 
 # CENTER
 
