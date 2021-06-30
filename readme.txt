@@ -34,7 +34,7 @@ packagelist=(
   # Fonts
   fonts-font-awesome
   # Locale
-  locales console-setup
+  locales
   # Multimedia
   firefox flameshot sxiv
 )
