@@ -75,21 +75,77 @@ git clone --depth=1 https://github.com/t1mron/devuan_live-cd $HOME/git/devuan_li
 cp -r $HOME/git/devuan_live-cd/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
 cp -r $HOME/git/devuan_live-cd/root/. /
 
-
-
-
-
-
-
-# Setup grub
-sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
-
-# Install grub and create configuration
-grub-install --root-directory=/ --boot-directory=/boot /dev/sda
-grub-mkconfig -o /boot/grub/grub.cfg
-
 # exit the chroot environmen
 exit
+
+# Create directories that will contain files for our live environment files and scratch files
+mkdir -p /mnt/LIVE_BOOT/{scratch,image/live}
+
+# Compress the chroot environment into a Squash filesystem
+mksquashfs \
+    /mnt/LIVE_BOOT/chroot \
+    /mnt/LIVE_BOOT/image/live/filesystem.squashfs \
+    -e boot
+
+# Copy the kernel and initramfs from inside the chroot to the live directory
+cp /mnt/LIVE_BOOT/chroot/boot/vmlinuz-* \
+    /mnt/LIVE_BOOT/image/vmlinuz && \
+cp /mnt/LIVE_BOOT/chroot/boot/initrd.img-* \
+    /mnt/LIVE_BOOT/image/initrd
+
+# Create a menu configuration file for grub
+cat <<'EOF' >/mnt/LIVE_BOOT/scratch/grub.cfg
+
+insmod all_video
+
+search --set=root --file /DEBIAN_CUSTOM
+
+set default="0"
+set timeout=30
+
+menuentry "Devuan Live" {
+    linux /vmlinuz boot=live quiet nomodeset
+    initrd /initrd
+}
+EOF
+
+touch /mnt/LIVE_BOOT/image/DEBIAN_CUSTOM
+
+# Create a grub BIOS image
+grub-mkstandalone \
+    --format=i386-pc \
+    --output=/mnt/LIVE_BOOT/scratch/core.img \
+    --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
+    --modules="linux normal iso9660 biosdisk search" \
+    --locales="" \
+    --fonts="" \
+    "boot/grub/grub.cfg=/mnt/LIVE_BOOT/scratch/grub.cfg"
+
+# Use cat to combine a bootable Grub cdboot.img bootloader with our boot image. 
+cat \
+    /usr/lib/grub/i386-pc/cdboot.img \
+    /mnt/LIVE_BOOT/scratch/core.img \
+> /mnt/LIVE_BOOT/scratch/bios.img
+
+# Create Bootable ISO
+xorriso \
+    -as mkisofs \
+    -iso-level 3 \
+    -full-iso9660-filenames \
+    -volid "DEBIAN_CUSTOM" \
+    --grub2-boot-info \
+    --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
+    -eltorito-boot \
+        boot/grub/bios.img \
+        -no-emul-boot \
+        -boot-load-size 4 \
+        -boot-info-table \
+        --eltorito-catalog boot/grub/boot.cat \
+    -output "/mnt/LIVE_BOOT/debian-custom.iso" \
+    -graft-points \
+        "/mnt/LIVE_BOOT/image" \
+        /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img
+
 
 # Reboot into the new system, don't forget to remove the usb
 reboot
