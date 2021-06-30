@@ -53,9 +53,14 @@ hwclock --systohc --utc
 # Set default locale
 echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 
-# Configure locales and keyboard
-dpkg-reconfigure locales
-dpkg-reconfigure keyboard-configuration 
+# Update current locale
+locale-gen
+
+# Set system language
+echo LANG=en_US.UTF-8 >> /etc/locale.conf
+
+# Set keymap and font for console 
+echo -e "KEYMAP=ru\nFONT=cyr-sun16" >> /etc/vconsole.conf
 
 # Set the host
 cat << EOF > /etc/hosts
