@@ -24,11 +24,13 @@ arch-chroot /mnt /bin/bash
 
 packagelist=(
   # basic
-  linux-image-amd64 grub2 sudo sysv-rc-conf network-manager network-manager-gnome iwd ssh neovim 
+  linux-image-amd64 grub2 cryptsetup lvm2 sudo sysv-rc-conf ssh neovim 
   # Window manager
   bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
   # Terminal tools 
-  git debootstrap arch-install-scripts man-db htop wget inetutils-ping
+  debootstrap arch-install-scripts git wget man-db htop inetutils-ping
+  # Network
+  network-manager network-manager-gnome iwd 
   # Fonts
   fonts-font-awesome
   # Locale
