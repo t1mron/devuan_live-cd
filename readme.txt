@@ -1,4 +1,3 @@
-# create usb os
 sudo apt-get install --assume-yes ssh debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
 
 head -c 3145728 /dev/urandom > /dev/sda; sync 
@@ -113,6 +112,22 @@ touch /mnt/LIVE_BOOT/image/DEBIAN_CUSTOM
 
 # Create a grub BIOS image
 grub-mkstandalone \
+    --format=x86_64-efi \
+    --output=/mnt/LIVE_BOOT/scratch/bootx64.efi \
+    --locales="" \
+    --fonts="" \
+    "boot/grub/grub.cfg=/mnt/LIVE_BOOT/scratch/grub.cfg"
+
+#  Create a FAT16 UEFI boot disk image containing the EFI bootloader
+(cd $HOME/LIVE_BOOT/scratch && \
+    dd if=/dev/zero of=efiboot.img bs=1M count=10 && \
+    mkfs.vfat efiboot.img && \
+    mmd -i efiboot.img efi efi/boot && \
+    mcopy -i efiboot.img ./bootx64.efi ::efi/boot/
+)
+
+# Create a grub BIOS image
+grub-mkstandalone \
     --format=i386-pc \
     --output=/mnt/LIVE_BOOT/scratch/core.img \
     --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
@@ -121,31 +136,35 @@ grub-mkstandalone \
     --fonts="" \
     "boot/grub/grub.cfg=/mnt/LIVE_BOOT/scratch/grub.cfg"
 
-# Use cat to combine a bootable Grub cdboot.img bootloader with our boot image. 
+# Use cat to combine a bootable Grub cdboot.img bootloader with our boot image
 cat \
     /usr/lib/grub/i386-pc/cdboot.img \
     /mnt/LIVE_BOOT/scratch/core.img \
 > /mnt/LIVE_BOOT/scratch/bios.img
 
-# Create Bootable ISO
+# Generate the ISO file.
 xorriso \
     -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
     -volid "DEBIAN_CUSTOM" \
-    --grub2-boot-info \
-    --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
     -eltorito-boot \
         boot/grub/bios.img \
         -no-emul-boot \
         -boot-load-size 4 \
         -boot-info-table \
         --eltorito-catalog boot/grub/boot.cat \
+    --grub2-boot-info \
+    --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
+    -eltorito-alt-boot \
+        -e EFI/efiboot.img \
+        -no-emul-boot \
+    -append_partition 2 0xef /mnt/LIVE_BOOT/scratch/efiboot.img \
     -output "/mnt/LIVE_BOOT/debian-custom.iso" \
     -graft-points \
         "/mnt/LIVE_BOOT/image" \
-        /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img
-
+        /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img \
+        /EFI/efiboot.img=/mnt/LIVE_BOOT/scratch/efiboot.img
 
 # Reboot into the new system, don't forget to remove the usb
 reboot
