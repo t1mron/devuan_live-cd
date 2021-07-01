@@ -153,7 +153,7 @@ xorriso \
     -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
-    -volid "DEBIAN_CUSTOM" \
+    -volid "DEVUAN_CUSTOM" \
     -eltorito-boot \
         boot/grub/bios.img \
         -no-emul-boot \
@@ -166,7 +166,7 @@ xorriso \
         -e EFI/efiboot.img \
         -no-emul-boot \
     -append_partition 2 0xef /mnt/LIVE_BOOT/scratch/efiboot.img \
-    -output "/mnt/LIVE_BOOT/debian-custom.iso" \
+    -output "/mnt/LIVE_BOOT/devuan-custom.iso" \
     -graft-points \
         "/mnt/LIVE_BOOT/image" \
         /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img \
