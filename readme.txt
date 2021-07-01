@@ -137,24 +137,19 @@ xorriso \
     -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
-    -volid "DEVUAN_CUSTOM" \
+    -volid "DEBIAN_CUSTOM" \
+    --grub2-boot-info \
+    --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
     -eltorito-boot \
         boot/grub/bios.img \
         -no-emul-boot \
         -boot-load-size 4 \
         -boot-info-table \
         --eltorito-catalog boot/grub/boot.cat \
-    --grub2-boot-info \
-    --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
-    -eltorito-alt-boot \
-        -e EFI/efiboot.img \
-        -no-emul-boot \
-    -append_partition 2 0xef /mnt/LIVE_BOOT/scratch/efiboot.img \
-    -output "/mnt/LIVE_BOOT/devuan-custom.iso" \
+    -output "/mnt/LIVE_BOOT/debian-custom.iso" \
     -graft-points \
         "/mnt/LIVE_BOOT/image" \
-        /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img \
-        /EFI/efiboot.img=/mnt/LIVE_BOOT/scratch/efiboot.img
+        /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img
 
 # Reboot into the new system, don't forget to remove the usb
 reboot
