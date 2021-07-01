@@ -137,7 +137,7 @@ xorriso \
     -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
-    -volid "DEBIAN_CUSTOM" \
+    -volid "DEVUAN_CUSTOM" \
     --grub2-boot-info \
     --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
     -eltorito-boot \
@@ -146,7 +146,7 @@ xorriso \
         -boot-load-size 4 \
         -boot-info-table \
         --eltorito-catalog boot/grub/boot.cat \
-    -output "/mnt/LIVE_BOOT/debian-custom.iso" \
+    -output "/mnt/LIVE_BOOT/devuan-custom.iso" \
     -graft-points \
         "/mnt/LIVE_BOOT/image" \
         /boot/grub/bios.img=/mnt/LIVE_BOOT/scratch/bios.img
