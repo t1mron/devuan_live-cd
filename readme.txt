@@ -19,7 +19,8 @@ mkdir -p /mnt/LIVE_BOOT
 debootstrap --variant=minbase --arch amd64 ceres /mnt/LIVE_BOOT/chroot http://deb.devuan.org/merged/ 
 
 deb http://deb.devuan.org/merged ceres main 
-deb http://deb.devuan.org/merged ceres main non-free
+deb http://deb.devuan.org/merged beowulf main non-free contrib
+
 
 # Enter the new system
 sudo chroot /mnt/LIVE_BOOT/chroot
