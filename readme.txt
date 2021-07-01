@@ -119,7 +119,7 @@ grub-mkstandalone \
     "boot/grub/grub.cfg=/mnt/LIVE_BOOT/scratch/grub.cfg"
 
 #  Create a FAT16 UEFI boot disk image containing the EFI bootloader
-(cd $HOME/LIVE_BOOT/scratch && \
+(cd /mnt/LIVE_BOOT/scratch && \
     dd if=/dev/zero of=efiboot.img bs=1M count=10 && \
     mkfs.vfat efiboot.img && \
     mmd -i efiboot.img efi efi/boot && \
