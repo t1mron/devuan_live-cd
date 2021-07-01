@@ -40,6 +40,8 @@ packagelist=(
   locales
   # Multimedia
   firefox flameshot sxiv
+  # Firmware
+  firmware-linux-nonfree
 )
 
 DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
