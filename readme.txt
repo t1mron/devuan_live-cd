@@ -1,4 +1,4 @@
-sudo apt-get install --assume-yes ssh debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
+sudo apt-get install --assume-yes ssh debootstrap squashfs-tools xorriso grub-pc-bin mtools
 
 head -c 3145728 /dev/urandom > /dev/sda; sync 
 (echo o;echo w) | fdisk /dev/sda
