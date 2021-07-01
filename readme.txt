@@ -103,7 +103,7 @@ cat <<'EOF' >/mnt/LIVE_BOOT/scratch/grub.cfg
 
 insmod all_video
 
-search --set=root --file /DEBIAN_CUSTOM
+search --set=root --file /DEVUAN_CUSTOM
 
 set default="0"
 set timeout=30
@@ -114,7 +114,7 @@ menuentry "Devuan Live" {
 }
 EOF
 
-touch /mnt/LIVE_BOOT/image/DEBIAN_CUSTOM
+touch /mnt/LIVE_BOOT/image/DEVUAN_CUSTOM
 
 # Create a grub BIOS image
 grub-mkstandalone \
