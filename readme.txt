@@ -118,22 +118,6 @@ touch /mnt/LIVE_BOOT/image/DEVUAN_CUSTOM
 
 # Create a grub BIOS image
 grub-mkstandalone \
-    --format=x86_64-efi \
-    --output=/mnt/LIVE_BOOT/scratch/bootx64.efi \
-    --locales="" \
-    --fonts="" \
-    "boot/grub/grub.cfg=/mnt/LIVE_BOOT/scratch/grub.cfg"
-
-#  Create a FAT16 UEFI boot disk image containing the EFI bootloader
-(cd /mnt/LIVE_BOOT/scratch && \
-    dd if=/dev/zero of=efiboot.img bs=1M count=10 && \
-    mkfs.vfat efiboot.img && \
-    mmd -i efiboot.img efi efi/boot && \
-    mcopy -i efiboot.img ./bootx64.efi ::efi/boot/
-)
-
-# Create a grub BIOS image
-grub-mkstandalone \
     --format=i386-pc \
     --output=/mnt/LIVE_BOOT/scratch/core.img \
     --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
