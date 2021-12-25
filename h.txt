@@ -23,8 +23,7 @@ head -c 3145728 /dev/urandom > /dev/sda; sync
 modprobe dm-mod
 
 # Encrypt and open /dev/sda1
-cryptsetup -v --cipher serpent-xts-plain64 --key-size 512 --hash whirlpool --use-random --verify-passphrase luksFormat --type luks1 /dev/sda2
-
+cryptsetup luksFormat --type luks1 /dev/sda2
 cryptsetup open /dev/sda2 lvm
 
 pvcreate /dev/mapper/lvm
@@ -56,6 +55,7 @@ chroot /mnt /bin/bash
 # edit fstab 
 echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
 echo UUID=$(blkid -s UUID -o value /dev/matrix/rootvol) / ext4 defaults,noatime 0 0 >> /etc/fstab
+echo sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) none luks,discard,initramfs >> /etc/crypttab
 
 packagelist=(
   # Base
