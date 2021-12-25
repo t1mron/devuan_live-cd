@@ -133,7 +133,7 @@ exit
 cat << EOF > /etc/default/grub
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
-GRUB_DISTRIBUTOR="Arch"
+GRUB_DISTRIBUTOR="Debian"
 GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda2):cryptlvm"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
 GRUB_ENABLE_CRYPTODISK=y
