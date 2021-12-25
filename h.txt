@@ -41,32 +41,33 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt /bin/bash
 
 packagelist=(
-  # basic
-  linux-image-amd64 grub2 cryptsetup lvm2 sudo sysv-rc-conf ssh neovim 
-  # Window manager
-  bspwm sxhkd xserver-xorg-core xinit xinput x11-utils x11-xserver-utils xterm polybar rofi
+  # Base
+  linux-image-amd64 lvm2 grub
+  # Xorg
+  xserver-xorg-core xserver-xorg-input-libinput xinit xinput x11-utils x11-xserver-utils xterm 
+  # AMD
+  # Window manager 
+  bspwm sxhkd polybar rofi thunar xdg-user-dirs
+  # Laptop
+  acpid tlp powertop lm-sensors
+  # sound, bluetooth, vpn
+  pipewire pipewire-pulse pavucontrol bluez Bluez-tools blueman
+  # Coding  
+  python-pip git vim-gtk
+  # Office programs
   # Terminal tools 
-  debootstrap arch-install-scripts git wget man-db htop inetutils-ping
-  # Network
-  network-manager network-manager-gnome iwd 
-  # Fonts
-  fonts-font-awesome
-  # Locale
-  locales
+  debootstrap arch-install-scripts htop openssh-client man-db gpm wget curl playerctl
   # Multimedia
-  firefox flameshot sxiv
+  firefox-esr torbrowser-launcher flameshot mpv telegram-desktop
+  # Look and feel
+  zsh lxappearance feh neofetch fonts-dejavu fonts-font-awesome
+  # Security
+  ssh cryptsetup
+  # Network
+  iwd 
 )
 
 DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
-
-# Delete modem manager
-apt-get --assume-yes purge modemmanager
-
-# clean apt downloaded archives
-apt clean
-
-# root password
-echo -e "toor\ntoor" | passwd root
 
 # default shell bash
 chsh -s /bin/bash root
