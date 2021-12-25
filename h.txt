@@ -69,11 +69,21 @@ packagelist=(
 
 DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
 
-# default shell bash
-chsh -s /bin/bash root
+systemctl enable tlp iwd gpm bluetooth
+
+# Create user
+useradd -G wheel,rfkill -m -d /home/user user
+passwd user
+useradd -G wheel -m -d /home/help help
+passwd help
+
+chsh -s /bin/zsh user
+
+# Add sudo privileges
+echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 
 # Set the time zone and a system clock
-ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+ln -s /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc --utc
 
 # Set default locale
@@ -82,17 +92,28 @@ echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 # Update current locale
 locale-gen
 
+# Set system language
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+
+# Set keymap and font for console 
+echo -e "KEYMAP=ru\nFONT=cyr-sun16" > /etc/vconsole.conf
+
+# Set the hostname
+echo debian > /etc/hostname
+
 # Set the host
 cat << EOF > /etc/hosts
 127.0.0.1    localhost
 ::1          localhost
-127.0.1.1    devuan.localdomain devuan
+127.0.1.1    debian.localdomain debian
 EOF
 
-# dotfiles
-git clone --depth=1 https://github.com/t1mron/devuan_live-cd $HOME/git/devuan_live-cd
-cp -r $HOME/git/devuan_live-cd/. $HOME/ && rm -rf $HOME/{root,.git,LICENSE,README.md,readme.txt}
-cp -r $HOME/git/devuan_live-cd/root/. /
+su user 
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions $HOME/.zsh/zsh-autosuggestions
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting $HOME/.zsh/zsh-syntax-highlighting
+git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-prompt
+
+exit
 
 # Setup grub
 sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
