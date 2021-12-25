@@ -1,20 +1,38 @@
-# create usb os
-sudo apt-get install --assume-yes ssh debootstrap arch-install-scripts
+# Sync time 
+timedatectl set-ntp true 
 
-head -c 3145728 /dev/urandom > /dev/sda; sync 
+# 
+sudo apt-get install --assume-yes debootstrap openssh-server arch-install-scripts
+
+# Delete a luks cont. if exist
+head -c 3145728 /dev/urandom > /dev/sda; sync
+
+# mbr
 (echo o;echo w) | fdisk /dev/sda
 
-# /dev/sdb1 All Linux filesystem
+# /dev/sda1 All Linux filesystem
 (echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sda
 
+# Load encrypt modules
+modprobe dm-mod
+
+# Encrypt and open /dev/sda1
+cryptsetup -v --cipher serpent-xts-plain64 --key-size 512 --hash whirlpool --use-random --verify-passphrase luksFormat --type luks1 /dev/sda1
+
+cryptsetup open /dev/sda1 lvm
+
+pvcreate /dev/mapper/lvm
+vgcreate matrix /dev/mapper/lvm
+lvcreate -l +100%FREE matrix -n rootvol
+
 # Formatting the partitions
-mkfs.ext4 /dev/sda1
+mkfs.ext4 /dev/mapper/matrix-rootvol
 
 # Mount partition
-mount /dev/sda1 /mnt
+mount /dev/matrix/rootvol /mnt/
 
 # Install base system
-debootstrap --variant=minbase --arch amd64 ceres /mnt http://deb.devuan.org/merged/ 
+debootstrap --variant=minbase --arch amd64 stable /mnt http://deb.debian.org/debian/
 
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
