@@ -1,25 +1,33 @@
+sudo apt install openssh-server
+sudo systemctl start ssh
+sudo passwd ubuntu
+
+sudo su
 # Sync time 
 timedatectl set-ntp true 
 
 # 
-sudo apt-get install --assume-yes debootstrap openssh-server arch-install-scripts
+apt-get install --assume-yes debootstrap openssh-server
 
 # Delete a luks cont. if exist
 head -c 3145728 /dev/urandom > /dev/sda; sync
 
-# mbr
-(echo o;echo w) | fdisk /dev/sda
+# gpt
+(echo g;echo w) | fdisk /dev/sda
 
-# /dev/sda1 All Linux filesystem
-(echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sda
+# /dev/sda1 Boot - 512Mb
+(echo n;echo ;echo ;echo 1050623;echo w) | fdisk /dev/sda
+
+# /dev/sda2 All
+(echo n;echo ;echo ;echo ;echo w) | fdisk /dev/sda
 
 # Load encrypt modules
 modprobe dm-mod
 
 # Encrypt and open /dev/sda1
-cryptsetup -v --cipher serpent-xts-plain64 --key-size 512 --hash whirlpool --use-random --verify-passphrase luksFormat --type luks1 /dev/sda1
+cryptsetup -v --cipher serpent-xts-plain64 --key-size 512 --hash whirlpool --use-random --verify-passphrase luksFormat --type luks1 /dev/sda2
 
-cryptsetup open /dev/sda1 lvm
+cryptsetup open /dev/sda2 lvm
 
 pvcreate /dev/mapper/lvm
 vgcreate matrix /dev/mapper/lvm
@@ -27,22 +35,30 @@ lvcreate -l +100%FREE matrix -n rootvol
 
 # Formatting the partitions
 mkfs.ext4 /dev/mapper/matrix-rootvol
+mkdosfs -F 32 -n EFI /dev/sda1
 
 # Mount partition
 mount /dev/matrix/rootvol /mnt/
+mkdir /mnt/boot/efi
+mount /dev/sda1 /mnt/boot/efi
 
 # Install base system
 debootstrap --variant=minbase --arch amd64 stable /mnt http://deb.debian.org/debian/
 
-# Generate fstab
-genfstab -U /mnt >> /mnt/etc/fstab
+# Mounting Virtual Kernel File Systems
+mount --rbind /dev /mnt/dev/
+mount --rbind /proc /mnt/proc
+mount --rbind /sys /mnt/sys
+mount --rbind /run /mnt/run
 
 # Enter the new system
-arch-chroot /mnt /bin/bash
+chroot /mnt /bin/bash
+
+# edit fstab 
 
 packagelist=(
   # Base
-  linux-image-amd64 lvm2 grub
+  linux-image-amd64 lvm2 grub-efi-amd64 efibootmgr locales
   # Xorg
   xserver-xorg-core xserver-xorg-input-libinput xinit xinput x11-utils x11-xserver-utils xterm 
   # AMD
@@ -51,18 +67,18 @@ packagelist=(
   # Laptop
   acpid tlp powertop lm-sensors
   # sound, bluetooth, vpn
-  pipewire pipewire-pulse pavucontrol bluez Bluez-tools blueman
+  pipewire pavucontrol bluez bluez-tools blueman
   # Coding  
-  python-pip git vim-gtk
+  python3-pip git vim-gtk
   # Office programs
   # Terminal tools 
-  debootstrap arch-install-scripts htop openssh-client man-db gpm wget curl playerctl
+  debootstrap arch-install-scripts htop openssh-client man-db gpm wget curl iproute2 playerctl
   # Multimedia
-  firefox-esr torbrowser-launcher flameshot mpv telegram-desktop
+  firefox-esr flameshot mpv telegram-desktop
   # Look and feel
   zsh lxappearance feh neofetch fonts-dejavu fonts-font-awesome
   # Security
-  ssh cryptsetup
+  sudo ssh cryptsetup
   # Network
   iwd 
 )
@@ -72,18 +88,15 @@ DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
 systemctl enable tlp iwd gpm bluetooth
 
 # Create user
-useradd -G wheel,rfkill -m -d /home/user user
+useradd -G sudo -m -d /home/user user
 passwd user
-useradd -G wheel -m -d /home/help help
+useradd -G sudo -m -d /home/help help
 passwd help
 
 chsh -s /bin/zsh user
 
-# Add sudo privileges
-echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
-
 # Set the time zone and a system clock
-ln -s /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc --utc
 
 # Set default locale
@@ -115,15 +128,14 @@ git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-promp
 
 exit
 
-# Setup grub
-sed -i "s|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=1|" /etc/default/grub
+# Create grub configuration
+echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
+update-initramfs -c -k all
+update-grub
+grub-install --target=x86_64-efi
 
-# Install grub and create configuration
-grub-install --root-directory=/ --boot-directory=/boot /dev/sda
-grub-mkconfig -o /boot/grub/grub.cfg
-
-# exit the chroot environmen
-exit
+# Exit new system and go into the cd shell
+exit 
 
 # Reboot into the new system, don't forget to remove the usb
 reboot
