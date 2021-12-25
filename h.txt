@@ -139,6 +139,12 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
 GRUB_ENABLE_CRYPTODISK=y
 EOF
 
+# Don't enter a password twice
+mkdir -m 0700 /etc/keys
+(umask 0077 && dd if=/dev/urandom bs=1 count=64 of=/etc/keys/root.key conv=excl,fsync)
+cryptsetup luksAddKey /dev/sda2 /etc/keys/root.key
+cryptsetup luksDump /dev/sda2
+
 update-initramfs -c -k all
 update-grub
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --boot-directory=/boot --recheck --debug
