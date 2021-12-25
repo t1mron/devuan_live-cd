@@ -33,7 +33,7 @@ lvcreate -l +100%FREE matrix -n rootvol
 
 # Formatting the partitions
 mkfs.ext4 /dev/mapper/matrix-rootvol
-mkdosfs -F 32 -n EFI /dev/sda1
+mkfs.vfat -F32 /dev/sda1
 
 # Mount partition
 mount /dev/matrix/rootvol /mnt/
@@ -54,9 +54,8 @@ mount --rbind /run /mnt/run
 chroot /mnt /bin/bash
 
 # edit fstab 
-echo PARTUUID=$(blkid -s PARTUUID -o value /dev/sda1) /boot/efi vfat nofail,x-systemd.device-timeout=1 0 1 >> /etc/fstab
-echo UUID=$(blkid -s UUID -o value /dev/matrix/rootvol) / ext4 defaults 0 1 >> /etc/fstab
-echo sda2_crypt PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) none luks,discard,initramfs >> /etc/crypttab
+echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
+echo UUID=$(blkid -s UUID -o value /dev/matrix/rootvol) / ext4 defaults,noatime 0 0 >> /etc/fstab
 
 packagelist=(
   # Base
@@ -131,7 +130,18 @@ git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-promp
 exit
 
 # Create grub configuration
+cat << EOF > /etc/default/grub
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=1
+GRUB_DISTRIBUTOR="Arch"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda2):cryptlvm"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
+GRUB_ENABLE_CRYPTODISK=y
+EOF
+
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
+
+
 update-initramfs -c -k all
 update-grub
 grub-install --target=x86_64-efi
