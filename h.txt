@@ -54,6 +54,9 @@ mount --rbind /run /mnt/run
 chroot /mnt /bin/bash
 
 # edit fstab 
+echo PARTUUID=$(blkid -s PARTUUID -o value /dev/sda1) /boot/efi vfat nofail,x-systemd.device-timeout=1 0 1 >> /etc/fstab
+echo UUID=$(blkid -s UUID -o value /dev/matrix/rootvol) / ext4 defaults 0 1 >> /etc/fstab
+echo sda2_crypt PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) none luks,discard,initramfs >> /etc/crypttab
 
 packagelist=(
   # Base
