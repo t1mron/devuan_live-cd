@@ -1,13 +1,11 @@
-sudo apt install openssh-server
+sudo apt install openssh-server debootstrap
 sudo systemctl start ssh
 sudo passwd ubuntu
 
 sudo su
+
 # Sync time 
 timedatectl set-ntp true 
-
-# 
-apt-get install --assume-yes debootstrap openssh-server
 
 # Delete a luks cont. if exist
 head -c 3145728 /dev/urandom > /dev/sda; sync
@@ -39,6 +37,7 @@ mkdosfs -F 32 -n EFI /dev/sda1
 
 # Mount partition
 mount /dev/matrix/rootvol /mnt/
+mkdir /mnt/boot/
 mkdir /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
 
