@@ -47,7 +47,7 @@ chroot /mnt /bin/bash
 
 packagelist=(
   # Base
-  linux-image-amd64 lvm2 locales
+  linux-image-amd64 lvm2 grub-coreboot locales
   # Xorg
   xserver-xorg-core xserver-xorg-input-libinput xinit xinput x11-utils x11-xserver-utils xterm 
   # AMD
@@ -141,7 +141,7 @@ GRUB_ENABLE_CRYPTODISK=y
 EOF
 
 update-initramfs -c -k all
-update-grub
+grub-install --target=i386-coreboot
 
 # Exit new system and go into the cd shell
 exit 
