@@ -138,8 +138,11 @@ cryptsetup luksAddKey /dev/sda2 /etc/keys/root.key
 cryptsetup luksDump /dev/sda2
 
 # edit fstab 
-echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
-echo UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0 >> /etc/fstab
+cat << EOF > /etc/fstab
+UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1  
+/dev/mapper/vg1-root / ext4 defaults,noatime 0 0
+EOF
+
 echo "sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) sda2_crypt luks,initramfs,keyscript=/lib/cryptsetup/scripts/decrypt_derived" >> /etc/crypttab
 
 # Create grub configuration
@@ -147,7 +150,7 @@ cat << EOF > /etc/default/grub
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Debian"
-GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda2):sda2_crypt"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda2):lvm"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
 GRUB_ENABLE_CRYPTODISK=y
 EOF
