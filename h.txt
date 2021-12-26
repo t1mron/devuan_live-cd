@@ -125,6 +125,13 @@ git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-promp
 exit
 
 # Don't enter a password twice
+mkfifo fifo
+/lib/cryptsetup/scripts/decrypt_derived sda2_crypt > fifo &
+cryptsetup luksAddKey /dev/sda2 fifo
+rm fifo
+
+
+
 mkdir -m 0700 /etc/keys
 (umask 0077 && dd if=/dev/urandom bs=1 count=64 of=/etc/keys/root.key conv=excl,fsync)
 cryptsetup luksAddKey /dev/sda2 /etc/keys/root.key
@@ -133,7 +140,7 @@ cryptsetup luksDump /dev/sda2
 # edit fstab 
 echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
 echo UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0 >> /etc/fstab
-echo sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) /etc/keys/root.key luks,discard,key-slot=0 >> /etc/crypttab
+echo "sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) sda2_crypt luks,initramfs,keyscript=/lib/cryptsetup/scripts/decrypt_derived" >> /etc/crypttab
 
 # Create grub configuration
 cat << EOF > /etc/default/grub
