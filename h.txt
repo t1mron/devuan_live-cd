@@ -140,7 +140,7 @@ cryptsetup luksDump /dev/sda2
 # edit fstab 
 cat << EOF > /etc/fstab
 UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1  
-/dev/mapper/vg1-root / ext4 defaults,noatime 0 0
+UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0
 EOF
 
 echo "sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) sda2_crypt luks,initramfs,keyscript=/lib/cryptsetup/scripts/decrypt_derived" >> /etc/crypttab
