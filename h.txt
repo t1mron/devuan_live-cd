@@ -52,11 +52,6 @@ mount --rbind /run /mnt/run
 # Enter the new system
 chroot /mnt /bin/bash
 
-# edit fstab 
-echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
-echo UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0 >> /etc/fstab
-echo sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) none luks,discard,initramfs >> /etc/crypttab
-
 packagelist=(
   # Base
   linux-image-amd64 lvm2 grub-efi-amd64 efibootmgr locales
@@ -129,6 +124,11 @@ git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-promp
 
 exit
 
+# edit fstab 
+echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
+echo UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0 >> /etc/fstab
+echo sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) none luks,discard,initramfs >> /etc/crypttab
+
 # Create grub configuration
 cat << EOF > /etc/default/grub
 GRUB_DEFAULT=0
@@ -147,7 +147,7 @@ cryptsetup luksDump /dev/sda2
 
 update-initramfs -c -k all
 update-grub
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --boot-directory=/boot --recheck --debug
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --boot-directory=/boot
 
 # Exit new system and go into the cd shell
 exit 
