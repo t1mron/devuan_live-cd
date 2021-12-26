@@ -24,18 +24,18 @@ modprobe dm-mod
 
 # Encrypt and open /dev/sda1
 cryptsetup luksFormat --type luks1 /dev/sda2
-cryptsetup open /dev/sda2 lvm
+cryptsetup open /dev/sda2 sda2_crypt
 
-pvcreate /dev/mapper/lvm
-vgcreate matrix /dev/mapper/lvm
-lvcreate -l +100%FREE matrix -n rootvol
+pvcreate /dev/mapper/sda2_crypt
+vgcreate vg1 /dev/mapper/sda2_crypt
+lvcreate -l +100%FREE vg1 -n root 
 
 # Formatting the partitions
-mkfs.ext4 /dev/mapper/matrix-rootvol
+mkfs.ext4 /dev/mapper/vg1-root
 mkfs.vfat -F32 /dev/sda1
 
 # Mount partition
-mount /dev/matrix/rootvol /mnt/
+mount /dev/mapper/vg1-root /mnt/
 mkdir /mnt/boot/
 mkdir /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
@@ -54,7 +54,7 @@ chroot /mnt /bin/bash
 
 # edit fstab 
 echo UUID=$(blkid -s UUID -o value /dev/sda1) /boot/efi vfat defaults 0 1 >> /etc/fstab
-echo UUID=$(blkid -s UUID -o value /dev/matrix/rootvol) / ext4 defaults,noatime 0 0 >> /etc/fstab
+echo UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0 >> /etc/fstab
 echo sda2_crypt UUID=$(blkid -s UUID -o value /dev/sda2) none luks,discard,initramfs >> /etc/crypttab
 
 packagelist=(
@@ -134,7 +134,7 @@ cat << EOF > /etc/default/grub
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Debian"
-GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda2):lvm"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda2):sda2_crypt"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
 GRUB_ENABLE_CRYPTODISK=y
 EOF
