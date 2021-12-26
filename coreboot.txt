@@ -1,0 +1,150 @@
+sudo apt install openssh-server debootstrap
+sudo systemctl start ssh
+sudo passwd ubuntu
+
+sudo su
+
+# Sync time 
+timedatectl set-ntp true 
+
+# Delete a luks cont. if exist
+head -c 3145728 /dev/urandom > /dev/sda; sync
+
+# mbr
+(echo o;echo w) | fdisk /dev/sda
+
+# /dev/sda1 All Linux filesystem
+(echo n;echo ;echo ;echo ;echo ;echo a;echo w) | fdisk /dev/sda
+
+# Load encrypt modules
+modprobe dm-mod
+
+# Encrypt and open /dev/sda1
+cryptsetup luksFormat --type luks1 /dev/sda1
+cryptsetup open /dev/sda1 sda1_crypt
+
+pvcreate /dev/mapper/sda1_crypt
+vgcreate vg1 /dev/mapper/sda1_crypt
+lvcreate -l +100%FREE vg1 -n root 
+
+# Formatting the partitions
+mkfs.ext4 /dev/mapper/vg1-root
+
+# Mount partition
+mount /dev/mapper/vg1-root /mnt/
+
+# Install base system
+debootstrap --variant=minbase --arch amd64 stable /mnt http://deb.debian.org/debian/
+
+# Mounting Virtual Kernel File Systems
+mount --rbind /dev /mnt/dev/
+mount --rbind /proc /mnt/proc
+mount --rbind /sys /mnt/sys
+mount --rbind /run /mnt/run
+
+# Enter the new system
+chroot /mnt /bin/bash
+
+packagelist=(
+  # Base
+  linux-image-amd64 lvm2 locales
+  # Xorg
+  xserver-xorg-core xserver-xorg-input-libinput xinit xinput x11-utils x11-xserver-utils xterm 
+  # AMD
+  # Window manager 
+  bspwm sxhkd polybar rofi thunar xdg-user-dirs
+  # Laptop
+  acpid tlp powertop lm-sensors
+  # sound, bluetooth, vpn
+  pipewire pavucontrol bluez bluez-tools blueman
+  # Coding  
+  python3-pip git vim-gtk
+  # Office programs
+  # Terminal tools 
+  debootstrap arch-install-scripts htop openssh-client man-db gpm wget curl iproute2 playerctl
+  # Multimedia
+  firefox-esr flameshot mpv telegram-desktop
+  # Look and feel
+  zsh lxappearance feh neofetch fonts-dejavu fonts-font-awesome
+  # Security
+  sudo ssh cryptsetup
+  # Network
+  iwd 
+)
+
+DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
+
+systemctl enable tlp iwd gpm bluetooth
+
+# Create user
+useradd -G sudo -m -d /home/user user
+passwd user
+useradd -G sudo -m -d /home/help help
+passwd help
+
+chsh -s /bin/zsh user
+
+# Set the time zone and a system clock
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+hwclock --systohc --utc
+
+# Set default locale
+echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
+
+# Update current locale
+locale-gen
+
+# Set system language
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+
+# Set keymap and font for console 
+echo -e "KEYMAP=ru\nFONT=cyr-sun16" > /etc/vconsole.conf
+
+# Set the hostname
+echo debian > /etc/hostname
+
+# Set the host
+cat << EOF > /etc/hosts
+127.0.0.1    localhost
+::1          localhost
+127.0.1.1    debian.localdomain debian
+EOF
+
+su user 
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions $HOME/.zsh/zsh-autosuggestions
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting $HOME/.zsh/zsh-syntax-highlighting
+git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-prompt
+
+exit
+
+# Don't enter a password twice
+mkdir -m 0700 /etc/keys
+(umask 0077 && dd if=/dev/urandom bs=1 count=64 of=/etc/keys/root.key conv=excl,fsync)
+cryptsetup luksAddKey /dev/sda1 /etc/keys/root.key
+cryptsetup luksDump /dev/sda1
+
+# edit fstab 
+cat << EOF > /etc/fstab
+UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0
+EOF
+
+echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) /etc/keys/root.key luks,discard" >> /etc/crypttab
+
+# Create grub configuration
+cat << EOF > /etc/default/grub
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=1
+GRUB_DISTRIBUTOR="Debian"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda1):sda1_crypt root=UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root)"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
+GRUB_ENABLE_CRYPTODISK=y
+EOF
+
+update-initramfs -c -k all
+update-grub
+
+# Exit new system and go into the cd shell
+exit 
+
+# Reboot into the new system, don't forget to remove the usb
+reboot
