@@ -128,14 +128,8 @@ exit
 mkfifo fifo
 /lib/cryptsetup/scripts/decrypt_derived sda2_crypt > fifo &
 cryptsetup luksAddKey /dev/sda2 fifo
-rm fifo
-
-
-
-mkdir -m 0700 /etc/keys
-(umask 0077 && dd if=/dev/urandom bs=1 count=64 of=/etc/keys/root.key conv=excl,fsync)
-cryptsetup luksAddKey /dev/sda2 /etc/keys/root.key
 cryptsetup luksDump /dev/sda2
+rm fifo
 
 # edit fstab 
 cat << EOF > /etc/fstab
