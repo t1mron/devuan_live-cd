@@ -61,7 +61,7 @@ packagelist=(
   python3-pip git vim-gtk
   # Office programs
   # Terminal tools 
-  debootstrap arch-install-scripts htop openssh-client man-db gpm wget curl iproute2 playerctl
+  debootstrap htop openssh-client man-db gpm wget curl iproute2 playerctl
   # Multimedia
   firefox-esr flameshot mpv telegram-desktop
   # Look and feel
