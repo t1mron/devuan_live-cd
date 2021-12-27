@@ -87,7 +87,7 @@ packagelist=(
 
 DEBIAN_FRONTEND=noninteractive apt --assume-yes install ${packagelist[@]}
 
-systemctl enable tlp iwd gpm bluetooth
+systemctl enable tlp iwd gpm bluetooth systemd-networkd systemd-resolved
 
 # Create user
 useradd -G sudo -m -d /home/user user
@@ -109,6 +109,14 @@ cat << EOF > /etc/hosts
 127.0.0.1    localhost
 ::1          localhost
 127.0.1.1    debian.localdomain debian
+EOF
+
+cat << EOF > /etc/systemd/network/20-all.network
+[Match]
+Name=*
+
+[Network]
+DHCP=yes
 EOF
 
 su user 
