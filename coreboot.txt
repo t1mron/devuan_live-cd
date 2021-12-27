@@ -34,7 +34,7 @@ mkfs.ext4 /dev/mapper/vg1-root
 mount /dev/mapper/vg1-root /mnt/
 
 # Install base system
-debootstrap --variant=minbase --arch amd64 stable /mnt http://deb.debian.org/debian/
+debootstrap --variant=minbase --include=locales --arch amd64 stable /mnt http://deb.debian.org/debian/
 
 # Mounting Virtual Kernel File Systems
 mount --rbind /dev /mnt/dev/
@@ -45,9 +45,21 @@ mount --rbind /run /mnt/run
 # Enter the new system
 chroot /mnt /bin/bash
 
+# Set default locale
+echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
+
+# Update current locale
+locale-gen
+
+# Set system language
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+
+# Set keymap and font for console 
+echo -e "KEYMAP=ru\nFONT=cyr-sun16" > /etc/vconsole.conf
+
 packagelist=(
   # Base
-  linux-image-amd64 lvm2 grub-coreboot locales
+  linux-image-amd64 lvm2 grub-coreboot
   # Xorg
   xserver-xorg-core xserver-xorg-input-libinput xinit xinput x11-utils x11-xserver-utils xterm 
   # AMD
@@ -87,18 +99,6 @@ chsh -s /bin/zsh user
 # Set the time zone and a system clock
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc --utc
-
-# Set default locale
-echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
-
-# Update current locale
-locale-gen
-
-# Set system language
-echo LANG=en_US.UTF-8 > /etc/locale.conf
-
-# Set keymap and font for console 
-echo -e "KEYMAP=ru\nFONT=cyr-sun16" > /etc/vconsole.conf
 
 # Set the hostname
 echo debian > /etc/hostname
