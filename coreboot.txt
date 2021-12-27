@@ -137,14 +137,15 @@ cat << EOF > /etc/fstab
 UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0
 EOF
 
-echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) /etc/keys/root.key luks,discard" >> /etc/crypttab
+echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) /etc/keys/root.key luks,keyscript=/lib/cryptsetup/scripts/passdev" >> /etc/crypttab
+echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) none luks" >> /etc/crypttab
 
 # Create grub configuration
 cat << EOF > /etc/default/grub
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Debian"
-GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda1):sda1_crypt root=UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root)"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda1):sda1_crypt"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
 GRUB_ENABLE_CRYPTODISK=y
 EOF
