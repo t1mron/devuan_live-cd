@@ -150,7 +150,7 @@ GRUB_ENABLE_CRYPTODISK=y
 EOF
 
 update-initramfs -c -k all
-grub-install --target=i386-coreboot
+grub-update
 
 # Exit new system and go into the cd shell
 exit 
