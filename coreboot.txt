@@ -127,18 +127,16 @@ git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-promp
 exit
 
 # Don't enter a password twice
-mkdir -m 0700 /etc/keys
-(umask 0077 && dd if=/dev/urandom bs=1 count=64 of=/etc/keys/root.key conv=excl,fsync)
-cryptsetup luksAddKey /dev/sda1 /etc/keys/root.key
-cryptsetup luksDump /dev/sda1
+dd if=/dev/urandom of=/root/keyfile bs=1024 count=4
+chmod 0400 /root/keyfile
+cryptsetup luksAddKey /dev/sda1 /root/keyfile
 
 # edit fstab 
 cat << EOF > /etc/fstab
-UUID=$(blkid -s UUID -o value /dev/mapper/vg1-root) / ext4 defaults,noatime 0 0
+/dev/mapper/vg1-root / ext4 defaults,noatime 0 0
 EOF
 
-echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) /etc/keys/root.key luks,keyscript=/lib/cryptsetup/scripts/passdev" >> /etc/crypttab
-echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) none luks" >> /etc/crypttab
+echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) /root/keyfile luks" > /etc/crypttab
 
 # Create grub configuration
 cat << EOF > /etc/default/grub
