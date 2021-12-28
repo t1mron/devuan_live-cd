@@ -34,7 +34,7 @@ mkfs.ext4 /dev/mapper/vg1-root
 mount /dev/mapper/vg1-root /mnt/
 
 # Install base system
-debootstrap --variant=minbase --include=locales --arch amd64 stable /mnt http://deb.debian.org/debian/
+debootstrap --variant=minbase --include=locales,dialog --arch amd64 stable /mnt http://deb.debian.org/debian/
 
 # Mounting Virtual Kernel File Systems
 mount --rbind /dev /mnt/dev/
@@ -52,11 +52,8 @@ echo -e "en_US.UTF-8 UTF-8\nru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 # Update current locale
 locale-gen
 
-# Set system language
-echo LANG=en_US.UTF-8 > /etc/locale.conf
-
-# Set keymap and font for console 
-echo -e "KEYMAP=ru\nFONT=cyr-sun16" > /etc/vconsole.conf
+# Set keymap for console
+echo LC_ALL="ru_RU.UTF-8" > /etc/default/locale
 
 packagelist=(
   # Base
