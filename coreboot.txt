@@ -127,24 +127,24 @@ git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-promp
 exit
 
 # Don't enter a password twice
-dd if=/dev/urandom of=/root/keyfile bs=1024 count=4
-chmod 0400 /root/keyfile
-cryptsetup luksAddKey /dev/sda1 /root/keyfile
+mkdir /root/secrets && chmod 700 /root/secrets
+head -c 64 /dev/urandom > /root/secrets/crypto_keyfile.bin && chmod 600 /root/secrets/crypto_keyfile.bin
+cryptsetup -v luksAddKey -i 1 /dev/sda1 /root/secrets/crypto_keyfile.bin
 
 # edit fstab 
 cat << EOF > /etc/fstab
 /dev/mapper/vg1-root / ext4 defaults,noatime 0 0
 EOF
 
-echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) /root/keyfile luks" > /etc/crypttab
+echo "sda1_crypt UUID=$(blkid -s UUID -o value /dev/sda1) none luks" > /etc/crypttab
 
 # Create grub configuration
 cat << EOF > /etc/default/grub
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Debian"
-GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda1):sda1_crypt"
-GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=$(blkid -s UUID -o value /dev/sda1):sda1_crypt cryptkey=rootfs:/root/secrets/crypto_keyfile.bin"
+GRUB_CMDLINE_LINUX_DEFAULT=""
 GRUB_ENABLE_CRYPTODISK=y
 EOF
 
